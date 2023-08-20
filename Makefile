@@ -7,10 +7,14 @@ a.out: mbr.o
 	ld mbr.o -Ttext 0x7c00
 
 mbr.img: mbr.o
-	objcopy -S -O binary -j .text a.out mbr.img
+	objcopy -S -O binary -j .text a.out $@
 
-run:
-	qemu-system-x86_64 mbr.img
+run: mbr.img
+	qemu-system-x86_64 $<
+
+debug: mbr.img
+	qemu-system-x86_64 -s -S $< &   # run qemu in background
+	gdb -x init.gdb   # RTFM: gdb(1)
 
 clean:
 	rm -f mbr.o a.out mbr.img 
